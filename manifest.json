@@ -1,0 +1,271 @@
+{
+  "manifest_version": "0.4",
+  "name": "freelancer-ops-mcp",
+  "display_name": "Freelancer and Agency Ops",
+  "version": "0.1.0",
+  "description": "Client onboarding, invoices from calendar and commits, status reports and overdue chasers.",
+  "author": {
+    "name": "R28 AI, Inc.",
+    "url": "https://r28.ai"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/r28ai/freelancer-ops-mcp"
+  },
+  "homepage": "https://github.com/r28ai/freelancer-ops-mcp",
+  "license": "Apache-2.0",
+  "keywords": [
+    "charter",
+    "stripe",
+    "google drive",
+    "linear",
+    "google calendar",
+    "gmail",
+    "github",
+    "google docs",
+    "granola",
+    "google sheets",
+    "firecrawl"
+  ],
+  "server": {
+    "type": "uv",
+    "entry_point": "src/server.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "${__dirname}",
+        "src/server.py"
+      ],
+      "env": {
+        "STRIPE_API_KEY": "${user_config.stripe_api_key}",
+        "GOOGLE_CLIENT_ID": "${user_config.google_client_id}",
+        "GOOGLE_CLIENT_SECRET": "${user_config.google_client_secret}",
+        "LINEAR_API_KEY": "${user_config.linear_api_key}",
+        "GITHUB_TOKEN": "${user_config.github_token}",
+        "GRANOLA_API_KEY": "${user_config.granola_api_key}",
+        "FIRECRAWL_API_KEY": "${user_config.firecrawl_api_key}"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "stripe_customers_create",
+      "description": "Create a customer."
+    },
+    {
+      "name": "stripe_checkout_sessions_create",
+      "description": "Create a Checkout Session and get a hosted payment URL."
+    },
+    {
+      "name": "gdrive_files_copy",
+      "description": "Create a copy of a file and apply any requested updates with patch semantics."
+    },
+    {
+      "name": "gdrive_permissions_create",
+      "description": "Create a permission for a file or shared drive."
+    },
+    {
+      "name": "linear_project_create",
+      "description": "Create a project."
+    },
+    {
+      "name": "stripe_checkout_sessions_list",
+      "description": "List checkout sessions."
+    },
+    {
+      "name": "gcalendar_events_insert",
+      "description": "Create a calendar event; returns details of the event."
+    },
+    {
+      "name": "gmail_messages_send",
+      "description": "Send an email via the Gmail API."
+    },
+    {
+      "name": "linear_project_get",
+      "description": "Get one project with its content, milestones and members."
+    },
+    {
+      "name": "linear_issues_list",
+      "description": "List issues, optionally filtered."
+    },
+    {
+      "name": "github_repos_list_commits",
+      "description": "List commits, newest first."
+    },
+    {
+      "name": "gdocs_documents_create",
+      "description": "Create a blank document with a title."
+    },
+    {
+      "name": "gmail_drafts_create",
+      "description": "Save an email draft to Gmail."
+    },
+    {
+      "name": "granola_notes_get",
+      "description": "Read one meeting note: its AI summary, the people who attended, the calendar event it was taken against, and the folders it belongs to."
+    },
+    {
+      "name": "gdocs_documents_get",
+      "description": "Read a document's full structural content."
+    },
+    {
+      "name": "gcalendar_events_list",
+      "description": "List events matching a given search filter."
+    },
+    {
+      "name": "gsheets_spreadsheets_values_append",
+      "description": "Appends values to a spreadsheet."
+    },
+    {
+      "name": "stripe_invoice_items_create",
+      "description": "Add a line to an invoice."
+    },
+    {
+      "name": "stripe_invoices_list",
+      "description": "List invoices, most recently created first."
+    },
+    {
+      "name": "gmail_threads_list",
+      "description": "List Gmail threads."
+    },
+    {
+      "name": "gcalendar_events_quick_add",
+      "description": "Create an event from a plain-text description such as 'Appointment at Somewhere on June 3rd 10am-10:25am'."
+    },
+    {
+      "name": "firecrawl_crawl",
+      "description": "Recursively crawl a website and scrape each discovered page."
+    },
+    {
+      "name": "firecrawl_crawl_status",
+      "description": "Get the status and results of a crawl job."
+    },
+    {
+      "name": "gdrive_comments_list",
+      "description": "List a file's comments."
+    },
+    {
+      "name": "linear_issue_create",
+      "description": "Create an issue."
+    },
+    {
+      "name": "gdrive_replies_create",
+      "description": "Create a reply to a comment."
+    },
+    {
+      "name": "connection_status",
+      "description": "Which apps this server can reach, and how to connect the rest. Changes nothing."
+    },
+    {
+      "name": "connect",
+      "description": "Connect one app: where to get its key, or the Google sign-in in the browser."
+    }
+  ],
+  "prompts": [
+    {
+      "name": "setup",
+      "description": "Connect the apps this server uses.",
+      "text": "Help me connect the apps this server uses.\n\n1. Call `connection_status` to see what is connected.\n2. For each app it lists as not connected, call `connect` with that app. Where that opens a browser sign-in, tell me to approve it, then move on.\n3. Where an app needs a key, tell me the page to get it from and the exact command to run in my terminal (`freelancer-ops-mcp login <app>`). Do not ask me to paste a key into this chat.\n4. Call `connection_status` again and tell me what is still missing."
+    },
+    {
+      "name": "client_onboarding",
+      "description": "Deposit link, SOW from template, shared folder and project, for each new client.",
+      "text": "Client onboarding. Deposit link, SOW from template, shared folder and project, for each new client.\n\nUse these tools, in this order:\n1. `stripe_customers_create`\n2. `stripe_checkout_sessions_create`\n3. `gdrive_files_copy`\n4. `gdrive_permissions_create`\n5. `linear_project_create`\n\nBefore anything else, check whether any of these tools' apps is not connected: the server's instructions say, and so does `connection_status`. If one is not, tell me how to connect it first, before asking me for anything.\nRead before you write. Before any call that creates, sends, changes or deletes something, show me what it will do and wait for my go-ahead, unless I have told you to go ahead without asking.\nIf a tool says its app is not connected, tell me how to connect it, as the tool says, and stop there."
+    },
+    {
+      "name": "deposit_paid_to_kickoff",
+      "description": "The kickoff is booked the moment the deposit clears.",
+      "text": "Deposit paid → kickoff. The kickoff is booked the moment the deposit clears.\n\nUse these tools, in this order:\n1. `stripe_checkout_sessions_list`\n2. `gcalendar_events_insert`\n3. `linear_project_create`\n4. `gmail_messages_send`\n\nBefore anything else, check whether any of these tools' apps is not connected: the server's instructions say, and so does `connection_status`. If one is not, tell me how to connect it first, before asking me for anything.\nRead before you write. Before any call that creates, sends, changes or deletes something, show me what it will do and wait for my go-ahead, unless I have told you to go ahead without asking.\nIf a tool says its app is not connected, tell me how to connect it, as the tool says, and stop there."
+    },
+    {
+      "name": "client_status_report",
+      "description": "A weekly report the client can read, built from the work itself.",
+      "text": "Client status report. A weekly report the client can read, built from the work itself.\n\nUse these tools, in this order:\n1. `linear_project_get`\n2. `linear_issues_list`\n3. `github_repos_list_commits`\n4. `gdocs_documents_create`\n5. `gmail_drafts_create`\n\nBefore anything else, check whether any of these tools' apps is not connected: the server's instructions say, and so does `connection_status`. If one is not, tell me how to connect it first, before asking me for anything.\nRead before you write. Before any call that creates, sends, changes or deletes something, show me what it will do and wait for my go-ahead, unless I have told you to go ahead without asking.\nIf a tool says its app is not connected, tell me how to connect it, as the tool says, and stop there."
+    },
+    {
+      "name": "scope_creep_detector",
+      "description": "Asks on the call that aren't in the SOW get flagged and a change order drafted.",
+      "text": "Scope creep detector. Asks on the call that aren't in the SOW get flagged and a change order drafted.\n\nUse these tools, in this order:\n1. `granola_notes_get`\n2. `gdocs_documents_get`\n3. `linear_issues_list`\n4. `gmail_drafts_create`\n\nBefore anything else, check whether any of these tools' apps is not connected: the server's instructions say, and so does `connection_status`. If one is not, tell me how to connect it first, before asking me for anything.\nRead before you write. Before any call that creates, sends, changes or deletes something, show me what it will do and wait for my go-ahead, unless I have told you to go ahead without asking.\nIf a tool says its app is not connected, tell me how to connect it, as the tool says, and stop there."
+    },
+    {
+      "name": "billable_hours_from_calendar",
+      "description": "Client-tagged meetings become a timesheet and pending line items.",
+      "text": "Billable hours from calendar. Client-tagged meetings become a timesheet and pending line items.\n\nUse these tools, in this order:\n1. `gcalendar_events_list`\n2. `gsheets_spreadsheets_values_append`\n3. `stripe_invoice_items_create`\n\nBefore anything else, check whether any of these tools' apps is not connected: the server's instructions say, and so does `connection_status`. If one is not, tell me how to connect it first, before asking me for anything.\nRead before you write. Before any call that creates, sends, changes or deletes something, show me what it will do and wait for my go-ahead, unless I have told you to go ahead without asking.\nIf a tool says its app is not connected, tell me how to connect it, as the tool says, and stop there."
+    },
+    {
+      "name": "overdue_invoice_chaser",
+      "description": "Escalating reminders that cite the last thread, and a follow-up held on your calendar.",
+      "text": "Overdue invoice chaser. Escalating reminders that cite the last thread, and a follow-up held on your calendar.\n\nUse these tools, in this order:\n1. `stripe_invoices_list`\n2. `gmail_threads_list`\n3. `gmail_drafts_create`\n4. `gcalendar_events_quick_add`\n\nBefore anything else, check whether any of these tools' apps is not connected: the server's instructions say, and so does `connection_status`. If one is not, tell me how to connect it first, before asking me for anything.\nRead before you write. Before any call that creates, sends, changes or deletes something, show me what it will do and wait for my go-ahead, unless I have told you to go ahead without asking.\nIf a tool says its app is not connected, tell me how to connect it, as the tool says, and stop there."
+    },
+    {
+      "name": "client_site_audit_to_proposal",
+      "description": "A prospect's site audited and turned into a scoped proposal with a pay link.",
+      "text": "Client site audit → proposal. A prospect's site audited and turned into a scoped proposal with a pay link.\n\nUse these tools, in this order:\n1. `firecrawl_crawl`\n2. `firecrawl_crawl_status`\n3. `gdocs_documents_create`\n4. `stripe_checkout_sessions_create`\n\nBefore anything else, check whether any of these tools' apps is not connected: the server's instructions say, and so does `connection_status`. If one is not, tell me how to connect it first, before asking me for anything.\nRead before you write. Before any call that creates, sends, changes or deletes something, show me what it will do and wait for my go-ahead, unless I have told you to go ahead without asking.\nIf a tool says its app is not connected, tell me how to connect it, as the tool says, and stop there."
+    },
+    {
+      "name": "client_feedback_in_drive_comments_to_tasks",
+      "description": "Every comment the client left on a deliverable becomes a task, and they see the link.",
+      "text": "Client feedback in Drive comments → tasks. Every comment the client left on a deliverable becomes a task, and they see the link.\n\nUse these tools, in this order:\n1. `gdrive_comments_list`\n2. `linear_issue_create`\n3. `gdrive_replies_create`\n\nBefore anything else, check whether any of these tools' apps is not connected: the server's instructions say, and so does `connection_status`. If one is not, tell me how to connect it first, before asking me for anything.\nRead before you write. Before any call that creates, sends, changes or deletes something, show me what it will do and wait for my go-ahead, unless I have told you to go ahead without asking.\nIf a tool says its app is not connected, tell me how to connect it, as the tool says, and stop there."
+    }
+  ],
+  "user_config": {
+    "stripe_api_key": {
+      "type": "string",
+      "title": "Stripe: Secret or restricted key",
+      "description": "Optional. Get it at https://dashboard.stripe.com/apikeys",
+      "sensitive": true,
+      "required": false,
+      "default": ""
+    },
+    "google_client_id": {
+      "type": "string",
+      "title": "Google: OAuth client ID",
+      "description": "Optional. Your own OAuth client, made at https://console.cloud.google.com/auth/clients; with it set, ask Claude to connect Google.",
+      "sensitive": false,
+      "required": false,
+      "default": ""
+    },
+    "google_client_secret": {
+      "type": "string",
+      "title": "Google: OAuth client secret",
+      "description": "Optional. Your own OAuth client, made at https://console.cloud.google.com/auth/clients; with it set, ask Claude to connect Google.",
+      "sensitive": true,
+      "required": false,
+      "default": ""
+    },
+    "linear_api_key": {
+      "type": "string",
+      "title": "Linear: Personal API key",
+      "description": "Optional. Get it at https://linear.app/settings/account/security",
+      "sensitive": true,
+      "required": false,
+      "default": ""
+    },
+    "github_token": {
+      "type": "string",
+      "title": "GitHub: Personal access token",
+      "description": "Optional. Get it at https://github.com/settings/tokens/new?description=Charter&scopes=repo,read:user",
+      "sensitive": true,
+      "required": false,
+      "default": ""
+    },
+    "granola_api_key": {
+      "type": "string",
+      "title": "Granola: API key",
+      "description": "Optional. Get it at https://docs.granola.ai/help-center/sharing/integrations/granola-api",
+      "sensitive": true,
+      "required": false,
+      "default": ""
+    },
+    "firecrawl_api_key": {
+      "type": "string",
+      "title": "Firecrawl: API key",
+      "description": "Optional. Get it at https://www.firecrawl.dev/app/api-keys",
+      "sensitive": true,
+      "required": false,
+      "default": ""
+    }
+  }
+}
